@@ -1,5 +1,4 @@
 "use strict";
-// import AppError from '../errors/AppError';
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -36,14 +35,37 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+var typeorm_1 = require("typeorm");
+var TransactionsRepository_1 = __importDefault(require("../repositories/TransactionsRepository"));
+var AppError_1 = __importDefault(require("../errors/AppError"));
+// import AppError from '../errors/AppError';
 var DeleteTransactionService = /** @class */ (function () {
     function DeleteTransactionService() {
     }
-    DeleteTransactionService.prototype.execute = function () {
+    DeleteTransactionService.prototype.execute = function (id) {
         return __awaiter(this, void 0, void 0, function () {
+            var transactionsRepository, transactionExists;
             return __generator(this, function (_a) {
-                return [2 /*return*/];
+                switch (_a.label) {
+                    case 0:
+                        transactionsRepository = typeorm_1.getCustomRepository(TransactionsRepository_1.default);
+                        return [4 /*yield*/, transactionsRepository.findOne({
+                                where: { id: id },
+                            })];
+                    case 1:
+                        transactionExists = _a.sent();
+                        if (!transactionExists) {
+                            throw new AppError_1.default('Transaction not found.', 404);
+                        }
+                        return [4 /*yield*/, transactionsRepository.delete(id)];
+                    case 2:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
             });
         });
     };
