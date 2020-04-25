@@ -40,14 +40,29 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var express_1 = require("express");
-// import TransactionsRepository from '../repositories/TransactionsRepository';
+var typeorm_1 = require("typeorm");
+var TransactionsRepository_1 = __importDefault(require("../repositories/TransactionsRepository"));
 var CreateTransactionService_1 = __importDefault(require("../services/CreateTransactionService"));
 // import DeleteTransactionService from '../services/DeleteTransactionService';
 // import ImportTransactionsService from '../services/ImportTransactionsService';
 var transactionsRouter = express_1.Router();
 transactionsRouter.get('/', function (request, response) { return __awaiter(void 0, void 0, void 0, function () {
+    var transactionRepository, transactions, balance;
     return __generator(this, function (_a) {
-        return [2 /*return*/];
+        switch (_a.label) {
+            case 0:
+                transactionRepository = typeorm_1.getCustomRepository(TransactionsRepository_1.default);
+                return [4 /*yield*/, transactionRepository.find({
+                        select: ['id', 'title', 'type', 'value', 'created_at', 'updated_at'],
+                        relations: ['category'],
+                    })];
+            case 1:
+                transactions = _a.sent();
+                return [4 /*yield*/, transactionRepository.getBalance(transactions)];
+            case 2:
+                balance = _a.sent();
+                return [2 /*return*/, response.json({ transactions: transactions, balance: balance })];
+        }
     });
 }); });
 transactionsRouter.post('/', function (request, response) { return __awaiter(void 0, void 0, void 0, function () {

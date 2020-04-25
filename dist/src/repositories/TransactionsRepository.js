@@ -65,10 +65,28 @@ var TransactionsRepository = /** @class */ (function (_super) {
     function TransactionsRepository() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    TransactionsRepository.prototype.getBalance = function () {
+    TransactionsRepository.prototype.getBalance = function (transactions) {
         return __awaiter(this, void 0, void 0, function () {
+            var totalIncome, totalOutcome, balance;
             return __generator(this, function (_a) {
-                return [2 /*return*/];
+                totalIncome = transactions.reduce(function (accumulator, currentValue) {
+                    if (currentValue.type === 'income') {
+                        return +accumulator + +currentValue.value;
+                    }
+                    return accumulator;
+                }, 0);
+                totalOutcome = transactions.reduce(function (accumulator, currentValue) {
+                    if (currentValue.type === 'outcome') {
+                        return +accumulator + +currentValue.value;
+                    }
+                    return accumulator;
+                }, 0);
+                balance = {
+                    income: totalIncome,
+                    outcome: totalOutcome,
+                    total: totalIncome - totalOutcome,
+                };
+                return [2 /*return*/, balance];
             });
         });
     };

@@ -52,36 +52,45 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 // import AppError from '../errors/AppError';
 var typeorm_1 = require("typeorm");
-var Transaction_1 = __importDefault(require("../models/Transaction"));
 var Category_1 = __importDefault(require("../models/Category"));
 var AppError_1 = __importDefault(require("../errors/AppError"));
+var TransactionsRepository_1 = __importDefault(require("../repositories/TransactionsRepository"));
 var CreateTransactionService = /** @class */ (function () {
     function CreateTransactionService() {
     }
     CreateTransactionService.prototype.execute = function (_a) {
         var title = _a.title, value = _a.value, type = _a.type, category_title = _a.category_title;
         return __awaiter(this, void 0, void 0, function () {
-            var transactionsRepository, categoryRepository, category, transaction;
+            var transactionsRepository, categoryRepository, transactions, checkBalance, category, transaction;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
-                        transactionsRepository = typeorm_1.getRepository(Transaction_1.default);
+                        transactionsRepository = typeorm_1.getCustomRepository(TransactionsRepository_1.default);
                         categoryRepository = typeorm_1.getRepository(Category_1.default);
                         if (type !== 'income' && type !== 'outcome') {
                             throw new AppError_1.default('Invalid type.');
                         }
+                        return [4 /*yield*/, transactionsRepository.find()];
+                    case 1:
+                        transactions = _b.sent();
+                        return [4 /*yield*/, transactionsRepository.getBalance(transactions)];
+                    case 2:
+                        checkBalance = _b.sent();
+                        if (type === 'outcome' && checkBalance.total - value < 0) {
+                            throw new AppError_1.default('Insufficient funds');
+                        }
                         return [4 /*yield*/, categoryRepository.findOne({
                                 where: { title: category_title },
                             })];
-                    case 1:
+                    case 3:
                         category = _b.sent();
-                        if (!!category) return [3 /*break*/, 3];
+                        if (!!category) return [3 /*break*/, 5];
                         categoryRepository.create({ title: category_title });
                         return [4 /*yield*/, categoryRepository.save({ title: category_title })];
-                    case 2:
+                    case 4:
                         category = _b.sent();
-                        _b.label = 3;
-                    case 3:
+                        _b.label = 5;
+                    case 5:
                         transaction = transactionsRepository.create({
                             title: title,
                             value: value,
@@ -89,7 +98,7 @@ var CreateTransactionService = /** @class */ (function () {
                             category_id: category.id,
                         });
                         return [4 /*yield*/, transactionsRepository.save(transaction)];
-                    case 4:
+                    case 6:
                         _b.sent();
                         return [2 /*return*/, __assign(__assign({}, transaction), { category: category })];
                 }
