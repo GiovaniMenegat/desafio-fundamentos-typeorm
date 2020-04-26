@@ -7,11 +7,10 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-
 import Category from './Category';
 
 @Entity('transactions')
-class Transaction {
+export class Transaction {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
